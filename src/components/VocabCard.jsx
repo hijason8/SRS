@@ -21,7 +21,9 @@ export default function VocabCard({ item, onFeedback }) {
     u.lang = 'ja-JP';
     u.rate = SPEECH_RATE;
     const voices = window.speechSynthesis.getVoices();
-    const jaVoice = voices.find((v) => v.lang.startsWith('ja'));
+    const jaVoice =
+      voices.find((v) => v.lang === 'ja-JP') ||
+      voices.find((v) => v.lang.startsWith('ja'));
     if (jaVoice) u.voice = jaVoice;
     window.speechSynthesis.speak(u);
   }, [item?.kana, item?.kanji]);
@@ -36,7 +38,9 @@ export default function VocabCard({ item, onFeedback }) {
 
   const handlePlay = () => {
     setAudioUnlocked(true);
-    speak();
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.getVoices();
+    setTimeout(speak, 100);
   };
 
   const handleFeedback = (newStatus) => {
@@ -52,7 +56,7 @@ export default function VocabCard({ item, onFeedback }) {
         {item.kanji}
       </p>
 
-      {/* 第二層：聽發音（解鎖發音） */}
+      {/* 第二層：聽發音（使用 iPhone 內建日文語音） */}
       <div className="flex flex-col items-center gap-3 mb-4">
         <button
           type="button"
@@ -62,6 +66,9 @@ export default function VocabCard({ item, onFeedback }) {
         >
           {audioUnlocked ? '聽發音' : '解鎖發音'}
         </button>
+        <p className="text-xs text-slate-500 max-w-[280px] text-center">
+          使用裝置內建語音。若無日文：設定 → 輔助使用 → 語音內容 → 語音 → 加入「日文」
+        </p>
         {!showHint && (
           <button
             type="button"
