@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* iPhone / 觸控優化：防止長按選取影響背誦 */
+body {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* 允許卡內文字在必要時可選（可選） */
+.vocab-card-content {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* iPhone 安全區域：底部按鈕區 */
+.safe-area-pb {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
