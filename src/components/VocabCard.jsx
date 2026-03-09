@@ -14,14 +14,25 @@ export default function VocabCard({ item, onFeedback }) {
   }, [item?.id]);
 
   const speak = useCallback(() => {
-    if (!item?.kana && !item?.kanji) return;
-    if (!window.speechSynthesis) return;
+    const text = item?.kana || item?.kanji;
+    if (!text || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(item.kana || item.kanji);
+    const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ja-JP';
     u.rate = SPEECH_RATE;
+    const voices = window.speechSynthesis.getVoices();
+    const jaVoice = voices.find((v) => v.lang.startsWith('ja'));
+    if (jaVoice) u.voice = jaVoice;
     window.speechSynthesis.speak(u);
   }, [item?.kana, item?.kanji]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const loadVoices = () => window.speechSynthesis.getVoices();
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
 
   const handlePlay = () => {
     setAudioUnlocked(true);
